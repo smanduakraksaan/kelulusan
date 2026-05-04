@@ -81,15 +81,17 @@
         }
 
         .glass-panel {
+            position: relative;
             background: var(--card-bg);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(0, 188, 212, 0.2);
             border-radius: 32px;
             box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.1);
             transition: all 0.4s ease;
+            overflow: hidden;
         }
 
-        /* Geometric Morph Animation */
+        /* Improved Geometric Morph Animation */
         .morph-container {
             position: absolute;
             inset: 0;
@@ -103,18 +105,19 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(45deg, var(--primary-cyan), transparent);
-            filter: blur(40px);
-            opacity: 0.3;
-            animation: morphing 10s infinite alternate ease-in-out;
+            width: 450px;
+            height: 450px;
+            background: linear-gradient(135deg, var(--primary-cyan) 0%, transparent 100%);
+            filter: blur(50px);
+            opacity: 0.15;
+            animation: morphing 15s infinite alternate linear;
         }
 
         @keyframes morphing {
             0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: translate(-50%, -50%) rotate(0deg) scale(1); }
-            33% { border-radius: 50% 50% 20% 80% / 50% 20% 80% 50%; transform: translate(-50%, -50%) rotate(120deg) scale(1.2); }
-            66% { border-radius: 80% 20% 50% 50% / 20% 50% 50% 80%; transform: translate(-50%, -50%) rotate(240deg) scale(0.8); }
+            25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; transform: translate(-55%, -45%) rotate(90deg) scale(1.1); }
+            50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; transform: translate(-45%, -55%) rotate(180deg) scale(0.9); }
+            75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; transform: translate(-50%, -40%) rotate(270deg) scale(1.05); }
             100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: translate(-50%, -50%) rotate(360deg) scale(1); }
         }
 
@@ -134,6 +137,19 @@
             transform: translateY(-3px);
             box-shadow: 0 15px 35px -5px rgba(0, 188, 212, 0.6);
             filter: brightness(1.1);
+        }
+
+        .btn-outline-cyan {
+            background: transparent;
+            border: 2px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-cyan:hover {
+            background: var(--primary-cyan);
+            color: white;
         }
 
         .input-field {
@@ -234,6 +250,30 @@
             90% { opacity: 0.8; }
             100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
         }
+
+        /* Clap Emoji Animation */
+        .clap-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            pointer-events: none;
+            z-index: 101;
+            opacity: 0;
+            display: none;
+        }
+
+        @keyframes clap-pulse {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        .animate-clap {
+            display: block;
+            animation: clap-pulse 1s ease-out forwards;
+        }
     </style>
 </head>
 <body class="">
@@ -243,8 +283,9 @@
         <div class="glow-sphere" style="bottom: 5%; right: 5%; animation-delay: -7s;"></div>
     </div>
 
-    <!-- Balloon Container -->
+    <!-- Balloon & Overlay Containers -->
     <div id="balloon-container" class="balloon-container"></div>
+    <div id="clap-overlay" class="clap-overlay">👏</div>
 
     <!-- Header -->
     <header class="fixed top-0 w-full z-40 backdrop-blur-xl">
@@ -334,6 +375,10 @@
                     </div>
 
                     <div class="space-y-4">
+                        <button id="btn-celebrate" 
+                            class="w-full btn-outline-cyan py-5 rounded-2xl flex items-center justify-center text-xs tracking-[0.2em] shadow-lg hidden">
+                            <i class="fas fa-gift text-xl mr-3"></i> RAYAKAN LAGI
+                        </button>
                         <button onclick="window.location.reload()"
                             class="w-full btn-cyan py-5 rounded-2xl flex items-center justify-center text-xs tracking-[0.2em] shadow-xl">
                             <i class="fas fa-power-off text-xl mr-3"></i> KELUAR SISTEM
@@ -397,6 +442,7 @@
         const resultSection = document.getElementById('result-section');
         const loadingOverlay = document.getElementById('loading-overlay');
         const errorMsg = document.getElementById('error-msg');
+        const btnCelebrate = document.getElementById('btn-celebrate');
 
         function formatDateToKey(dateStr) {
             const date = new Date(dateStr);
@@ -424,8 +470,14 @@
             }
         }
 
-        // Fungsi Simulasi Tepuk Tangan menggunakan Audio Context
         function playApplause() {
+            // Visual Clap Emoji
+            const clapOverlay = document.getElementById('clap-overlay');
+            clapOverlay.classList.remove('animate-clap');
+            void clapOverlay.offsetWidth; // Trigger reflow
+            clapOverlay.classList.add('animate-clap');
+
+            // Sound Simulation
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (!AudioContext) return;
             const ctx = new AudioContext();
@@ -452,36 +504,40 @@
         let celebrationInterval;
         let celebrationStep = 0;
 
-        function startRotatingCelebration() {
-            // Hentikan interval lama jika ada
-            if (celebrationInterval) clearInterval(celebrationInterval);
-
-            const runStep = () => {
-                switch(celebrationStep % 4) {
-                    case 0: // Konfeti
-                        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                        break;
-                    case 1: // Kembang Api
-                        const animationEnd = Date.now() + 3000;
-                        const fwInterval = setInterval(() => {
-                            if (Date.now() > animationEnd) return clearInterval(fwInterval);
-                            confetti({ startVelocity: 30, spread: 360, ticks: 60, zIndex: 0, particleCount: 40, origin: { x: Math.random(), y: Math.random() - 0.2 } });
-                        }, 200);
-                        break;
-                    case 2: // Balon
-                        createBalloons();
-                        break;
-                    case 3: // Tepuk Tangan (Visual & Audio simulasi)
-                        playApplause();
-                        confetti({ particleCount: 100, scalar: 2, shapes: ['circle'], colors: ['#FFD700'] }); // Emas untuk tepuk tangan
-                        break;
-                }
-                celebrationStep++;
-            };
-
-            runStep(); // Jalankan segera
-            celebrationInterval = setInterval(runStep, 5000); // Ganti efek setiap 5 detik
+        function runCelebrationCycle() {
+            switch(celebrationStep % 4) {
+                case 0: // Konfeti
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    break;
+                case 1: // Kembang Api
+                    const animationEnd = Date.now() + 3000;
+                    const fwInterval = setInterval(() => {
+                        if (Date.now() > animationEnd) return clearInterval(fwInterval);
+                        confetti({ startVelocity: 30, spread: 360, ticks: 60, zIndex: 0, particleCount: 40, origin: { x: Math.random(), y: Math.random() - 0.2 } });
+                    }, 200);
+                    break;
+                case 2: // Balon
+                    createBalloons();
+                    break;
+                case 3: // Tepuk Tangan
+                    playApplause();
+                    confetti({ particleCount: 100, scalar: 2, shapes: ['circle'], colors: ['#FFD700'] });
+                    break;
+            }
+            celebrationStep++;
         }
+
+        function startRotatingCelebration() {
+            celebrationStep = 0; // Reset ke konfeti setiap awal
+            if (celebrationInterval) clearInterval(celebrationInterval);
+            
+            runCelebrationCycle();
+            celebrationInterval = setInterval(runCelebrationCycle, 4000); // Siklus setiap 4 detik
+        }
+
+        btnCelebrate.addEventListener('click', () => {
+            startRotatingCelebration();
+        });
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -546,6 +602,8 @@
                 resultGlow.style.background = "radial-gradient(circle, #00bcd4 0%, transparent 70%)";
                 badge.className = "mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest bg-green-500 text-white shadow-lg";
                 badge.innerHTML = '<i class="fas fa-check-circle"></i> Berhasil Lulus';
+                
+                btnCelebrate.classList.remove('hidden');
                 startRotatingCelebration();
             } else {
                 resultMsg.innerText = "MAAF, ANDA DINYATAKAN TIDAK LULUS";
@@ -553,6 +611,7 @@
                 resultGlow.style.background = "radial-gradient(circle, #ef4444 0%, transparent 70%)";
                 badge.className = "mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest bg-red-600 text-white shadow-lg";
                 badge.innerHTML = '<i class="fas fa-times-circle"></i> Belum Berhasil';
+                btnCelebrate.classList.add('hidden');
             }
         }
     </script>
