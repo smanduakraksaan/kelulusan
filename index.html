@@ -41,7 +41,6 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        /* Animated Tech Background */
         .bg-tech {
             position: fixed;
             top: 0;
@@ -90,6 +89,35 @@
             transition: all 0.4s ease;
         }
 
+        /* Geometric Morph Animation */
+        .morph-container {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .morph-shape {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, var(--primary-cyan), transparent);
+            filter: blur(40px);
+            opacity: 0.3;
+            animation: morphing 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes morphing {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+            33% { border-radius: 50% 50% 20% 80% / 50% 20% 80% 50%; transform: translate(-50%, -50%) rotate(120deg) scale(1.2); }
+            66% { border-radius: 80% 20% 50% 50% / 20% 50% 50% 80%; transform: translate(-50%, -50%) rotate(240deg) scale(0.8); }
+            100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+        }
+
         .cyan-glow-text {
             text-shadow: 0 0 20px rgba(0, 229, 255, 0.8), 0 0 10px rgba(0, 229, 255, 0.4);
         }
@@ -124,10 +152,6 @@
             border-color: var(--primary-cyan);
             background: white;
             box-shadow: 0 0 20px rgba(0, 188, 212, 0.2);
-        }
-
-        .dark-mode .input-field:focus {
-            background: rgba(15, 23, 42, 0.8);
         }
 
         /* Oval Lonjong Photo */
@@ -169,11 +193,6 @@
             background: rgba(0, 188, 212, 0.1);
             color: var(--primary-cyan);
             transition: all 0.3s ease;
-        }
-
-        #theme-toggle:hover {
-            background: var(--primary-cyan);
-            color: white;
         }
 
         /* Balloon Animation */
@@ -224,10 +243,10 @@
         <div class="glow-sphere" style="bottom: 5%; right: 5%; animation-delay: -7s;"></div>
     </div>
 
-    <!-- Balloon Container for perayaan -->
+    <!-- Balloon Container -->
     <div id="balloon-container" class="balloon-container"></div>
 
-    <!-- Header / Navbar -->
+    <!-- Header -->
     <header class="fixed top-0 w-full z-40 backdrop-blur-xl">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="#" onclick="window.location.reload()" class="transition-transform hover:scale-105">
@@ -287,34 +306,40 @@
 
             <!-- SECTION HASIL -->
             <div id="result-section" class="glass-panel p-8 md:p-10 hidden text-center scale-95 opacity-0 transition-all duration-700">
-                <div class="mb-8">
-                    <div class="profile-oval relative">
-                        <img id="student-photo" src="" alt="Foto Siswa">
+                <!-- Geometric Morph Background -->
+                <div class="morph-container">
+                    <div class="morph-shape"></div>
+                </div>
+
+                <div class="relative z-10">
+                    <div class="mb-8">
+                        <div class="profile-oval relative">
+                            <img id="student-photo" src="" alt="Foto Siswa">
+                        </div>
+                        <div id="badge-status" class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm"></div>
                     </div>
-                    <div id="badge-status" class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm"></div>
-                </div>
 
-                <h2 id="student-name" class="text-3xl font-extrabold mb-1"></h2>
-                <div class="flex justify-center gap-2 mb-8">
-                    <span class="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-3 py-1 rounded-lg text-[10px] font-black border border-cyan-500/10" id="display-nisn"></span>
-                    <span class="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-3 py-1 rounded-lg text-[10px] font-black border border-cyan-500/10" id="display-kelas"></span>
-                </div>
-
-                <div id="result-box" class="mb-10 p-8 rounded-3xl border border-cyan-500/10 relative overflow-hidden bg-white/50 dark:bg-black/20">
-                    <div id="result-bg-glow" class="absolute inset-0 opacity-40"></div>
-                    <div class="relative z-10">
-                        <p class="text-[10px] uppercase tracking-[0.3em] opacity-50 font-bold mb-4">Status Pernyataan Resmi</p>
-                        <div id="result-message" class="text-2xl font-black leading-tight italic"></div>
+                    <h2 id="student-name" class="text-3xl font-extrabold mb-1"></h2>
+                    <div class="flex justify-center gap-2 mb-8">
+                        <span class="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-3 py-1 rounded-lg text-[10px] font-black border border-cyan-500/10" id="display-nisn"></span>
+                        <span class="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-3 py-1 rounded-lg text-[10px] font-black border border-cyan-500/10" id="display-kelas"></span>
                     </div>
-                </div>
 
-                <div class="space-y-4">
-                    <!-- Tombol Unduh SK disembunyikan sesuai permintaan -->
-                    <button onclick="window.location.reload()"
-                        class="w-full btn-cyan py-5 rounded-2xl flex items-center justify-center text-xs tracking-[0.2em] shadow-xl">
-                        <i class="fas fa-power-off text-xl mr-3"></i> KELUAR SISTEM
-                    </button>
-                    <p class="text-muted text-[10px] font-bold uppercase tracking-widest opacity-60">Silakan hubungi pihak sekolah untuk fisik SKL</p>
+                    <div id="result-box" class="mb-10 p-8 rounded-3xl border border-cyan-500/10 relative overflow-hidden bg-white/50 dark:bg-black/20">
+                        <div id="result-bg-glow" class="absolute inset-0 opacity-40"></div>
+                        <div class="relative z-10">
+                            <p class="text-[10px] uppercase tracking-[0.3em] opacity-50 font-bold mb-4">Status Pernyataan Resmi</p>
+                            <div id="result-message" class="text-2xl font-black leading-tight italic"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <button onclick="window.location.reload()"
+                            class="w-full btn-cyan py-5 rounded-2xl flex items-center justify-center text-xs tracking-[0.2em] shadow-xl">
+                            <i class="fas fa-power-off text-xl mr-3"></i> KELUAR SISTEM
+                        </button>
+                        <p class="text-muted text-[10px] font-bold uppercase tracking-widest opacity-60">Silakan hubungi pihak sekolah untuk fisik SKL</p>
+                    </div>
                 </div>
             </div>
 
@@ -384,8 +409,7 @@
         function createBalloons() {
             const container = document.getElementById('balloon-container');
             const colors = ['#00bcd4', '#00e5ff', '#ffeb3b', '#ff4081', '#7c4dff'];
-            
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 25; i++) {
                 setTimeout(() => {
                     const balloon = document.createElement('div');
                     balloon.className = 'balloon';
@@ -395,39 +419,68 @@
                     balloon.style.width = (Math.random() * 20 + 40) + 'px';
                     balloon.style.height = (parseFloat(balloon.style.width) * 1.3) + 'px';
                     container.appendChild(balloon);
-                    
-                    // Cleanup
                     setTimeout(() => balloon.remove(), 8000);
-                }, i * 200);
+                }, i * 150);
             }
         }
 
-        function startCelebration() {
-            // Intensitas Kembang Api (Confetti)
-            const duration = 15 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        // Fungsi Simulasi Tepuk Tangan menggunakan Audio Context
+        function playApplause() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const duration = 2;
+            const bufferSize = ctx.sampleRate * duration;
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
 
-            function randomInRange(min, max) {
-                return Math.random() * (max - min) + min;
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.5));
             }
 
-            const interval = setInterval(function() {
-                const timeLeft = animationEnd - Date.now();
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 1000;
+            
+            noise.connect(filter);
+            filter.connect(ctx.destination);
+            noise.start();
+        }
 
-                if (timeLeft <= 0) {
-                    return clearInterval(interval);
+        let celebrationInterval;
+        let celebrationStep = 0;
+
+        function startRotatingCelebration() {
+            // Hentikan interval lama jika ada
+            if (celebrationInterval) clearInterval(celebrationInterval);
+
+            const runStep = () => {
+                switch(celebrationStep % 4) {
+                    case 0: // Konfeti
+                        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                        break;
+                    case 1: // Kembang Api
+                        const animationEnd = Date.now() + 3000;
+                        const fwInterval = setInterval(() => {
+                            if (Date.now() > animationEnd) return clearInterval(fwInterval);
+                            confetti({ startVelocity: 30, spread: 360, ticks: 60, zIndex: 0, particleCount: 40, origin: { x: Math.random(), y: Math.random() - 0.2 } });
+                        }, 200);
+                        break;
+                    case 2: // Balon
+                        createBalloons();
+                        break;
+                    case 3: // Tepuk Tangan (Visual & Audio simulasi)
+                        playApplause();
+                        confetti({ particleCount: 100, scalar: 2, shapes: ['circle'], colors: ['#FFD700'] }); // Emas untuk tepuk tangan
+                        break;
                 }
+                celebrationStep++;
+            };
 
-                const particleCount = 50 * (timeLeft / duration);
-                
-                // Dua ledakan di sisi kiri dan kanan
-                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-            }, 250);
-
-            // Tambahkan balon
-            createBalloons();
+            runStep(); // Jalankan segera
+            celebrationInterval = setInterval(runStep, 5000); // Ganti efek setiap 5 detik
         }
 
         loginForm.addEventListener('submit', async (e) => {
@@ -481,7 +534,6 @@
             const photoImg = document.getElementById('student-photo');
             photoImg.src = getDirectDriveLink(foto) || `https://ui-avatars.com/api/?name=${nama}&background=00bcd4&color=fff`;
 
-            const resultBox = document.getElementById('result-box');
             const resultMsg = document.getElementById('result-message');
             const resultGlow = document.getElementById('result-bg-glow');
             const badge = document.getElementById('badge-status');
@@ -494,7 +546,7 @@
                 resultGlow.style.background = "radial-gradient(circle, #00bcd4 0%, transparent 70%)";
                 badge.className = "mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest bg-green-500 text-white shadow-lg";
                 badge.innerHTML = '<i class="fas fa-check-circle"></i> Berhasil Lulus';
-                startCelebration();
+                startRotatingCelebration();
             } else {
                 resultMsg.innerText = "MAAF, ANDA DINYATAKAN TIDAK LULUS";
                 resultMsg.className = "text-2xl font-black text-red-500";
